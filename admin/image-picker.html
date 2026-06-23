@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image Manager - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --surface: #ffffff;
+            --border: #e5e5e7;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
+            --danger: #ff3b30;
+            --success: #34c759;
+            --radius: 12px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f7;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .upload-zone {
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: #f0f7ff;
+            transform: scale(1.005);
+        }
+
+        .upload-zone.dragover {
+            box-shadow: 0 0 0 4px rgba(0,113,227,0.15);
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            background: #f0f7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .upload-zone h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .image-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+        }
+
+        .image-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-color: var(--accent);
+        }
+
+        .image-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,113,227,0.2);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-card .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 50%, rgba(0,0,0,0.6));
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: flex-end;
+            padding: 12px;
+        }
+
+        .image-card:hover .overlay {
+            opacity: 1;
+        }
+
+        .image-card .filename {
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .preview-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .preview-modal.active {
+            display: flex;
+        }
+
+        .preview-modal img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .preview-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .preview-modal .close-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1d1d1f;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .upload-preview {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .upload-preview.active {
+            display: block;
+        }
+
+        .upload-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .upload-preview .url-display {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .upload-preview input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            font-family: monospace;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .section-picker {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .section-picker h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-picker .selected-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .section-picker .selected-display img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-picker .selected-display .url {
+            flex: 1;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .section-picker .selected-display .placeholder {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        .copy-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📷 Image Manager</h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='login.html'">← Back to Login</button>
+            <button class="btn btn-secondary" onclick="loadImages()">🔄 Refresh</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Section Pickers -->
+        <div class="section-picker" data-section="hero">
+            <h3>🖼️ Hero Image</h3>
+            <div class="selected-display" id="hero-display">
+                <span class="placeholder">Click an image below to select as Hero image</span>
+            </div>
+            <p class="copy-hint">Selected URL auto-copies. Paste into Hero section field.</p>
+        </div>
+
+        <div class="section-picker" data-section="gallery">
+            <h3>🎨 Gallery Images</h3>
+            <div class="selected-display" id="gallery-display">
+                <span class="placeholder">Click images below to select for Gallery (multiple)</span>
+            </div>
+            <p class="copy-hint">Click multiple images. URLs auto-copy. Paste into Gallery section.</p>
+        </div>
+
+        <div class="section-picker" data-section="ingredients">
+            <h3>🧪 Ingredients Image</h3>
+            <div class="selected-display" id="ingredients-display">
+                <span class="placeholder">Click an image below to select as Ingredients image</span>
+            </div>
+        </div>
+
+        <div class="section-picker" data-section="benefits">
+            <h3>✨ Benefits Image</h3>
+            <div class="selected-display" id="benefits-display">
+                <span class="placeholder">Click an image below to select as Benefits image</span>
+            </div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">☁️</div>
+            <h3>Drop images here or click to upload</h3>
+            <p>Supports: JPG, PNG, GIF, WEBP, SVG (max 10MB)</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="upload-preview" id="uploadPreview">
+            <img id="previewImg" src="" alt="Preview">
+            <div class="url-display">
+                <input type="text" id="uploadedUrl" readonly>
+                <button class="btn btn-primary" onclick="copyUploadedUrl()">📋 Copy</button>
+            </div>
+        </div>
+
+        <!-- Image Gallery -->
+        <div class="gallery" id="gallery"></div>
+
+        <div class="empty-state" id="emptyState">
+            <div class="icon">📭</div>
+            <p>No images uploaded yet. Upload your first image above!</p>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="preview-modal" id="previewModal">
+        <button class="close-btn" onclick="closePreview()">✕</button>
+        <img id="modalImg" src="" alt="Preview">
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api/upload';
+        let allImages = [];
+        let selectedImages = {
+            hero: null,
+            gallery: [],
+            ingredients: null,
+            benefits: null
+        };
+
+        // Upload zone
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+            if (files.length) uploadFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) uploadFile(e.target.files[0]);
+        });
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const preview = document.getElementById('uploadPreview');
+            const previewImg = document.getElementById('previewImg');
+            const uploadedUrl = document.getElementById('uploadedUrl');
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                preview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.imageUrl) {
+                    uploadedUrl.value = data.imageUrl;
+                    previewImg.src = data.imageUrl;
+                    showToast('✓ Image uploaded successfully!');
+                    loadImages();
+                } else {
+                    throw new Error(data.error || 'Upload failed');
+                }
+            } catch (err) {
+                showToast('✗ Upload failed: ' + err.message, 'error');
+                preview.classList.remove('active');
+            }
+        }
+
+        function copyUploadedUrl() {
+            const input = document.getElementById('uploadedUrl');
+            input.select();
+            document.execCommand('copy');
+            showToast('✓ URL copied to clipboard!');
+        }
+
+        async function loadImages() {
+            try {
+                const res = await fetch(API_BASE);
+                allImages = await res.json();
+                renderGallery();
+                document.getElementById('emptyState').style.display = allImages.length ? 'none' : 'block';
+            } catch (err) {
+                showToast('✗ Failed to load images', 'error');
+            }
+        }
+
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = allImages.map(img => `
+                <div class="image-card ${isImageSelected(img.url) ? 'selected' : ''}" 
+                     onclick="selectImage('${img.url}')"
+                     ondblclick="openPreview('${img.url}')">
+                    <img src="${img.url}" alt="${img.filename}" loading="lazy">
+                    <div class="overlay">
+                        <span class="filename">${img.filename}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function isImageSelected(url) {
+            if (selectedImages.hero === url) return true;
+            if (selectedImages.gallery.includes(url)) return true;
+            if (selectedImages.ingredients === url) return true;
+            if (selectedImages.benefits === url) return true;
+            return false;
+        }
+
+        function selectImage(url) {
+            // Determine which section is being targeted based on the last focused picker
+            const activeSection = document.querySelector('.section-picker:hover')?.dataset.section 
+                || document.querySelector('.section-picker:focus-within')?.dataset.section
+                || 'hero';
+
+            switch(activeSection) {
+                case 'hero':
+                    selectedImages.hero = selectedImages.hero === url ? null : url;
+                    break;
+                case 'gallery':
+                    if (selectedImages.gallery.includes(url)) {
+                        selectedImages.gallery = selectedImages.gallery.filter(u => u !== url);
+                    } else {
+                        selectedImages.gallery.push(url);
+                    }
+                    break;
+                case 'ingredients':
+                    selectedImages.ingredients = selectedImages.ingredients === url ? null : url;
+                    break;
+                case 'benefits':
+                    selectedImages.benefits = selectedImages.benefits === url ? null : url;
+                    break;
+            }
+
+            updateAllDisplays();
+            renderGallery();
+
+            // Auto-copy URL
+            const urlToCopy = selectedImages[activeSection];
+            copyToClipboard(urlToCopy);
+        }
+
+        function updateAllDisplays() {
+            updateDisplay('hero', selectedImages.hero);
+            updateDisplay('gallery', selectedImages.gallery);
+            updateDisplay('ingredients', selectedImages.ingredients);
+            updateDisplay('benefits', selectedImages.benefits);
+        }
+
+        function updateDisplay(section, value) {
+            const display = document.getElementById(`${section}-display`);
+            if (!value || (Array.isArray(value) && value.length === 0)) {
+                display.innerHTML = '<span class="placeholder">Click an image below to select</span>';
+            } else if (Array.isArray(value)) {
+                display.innerHTML = value.map(url => `
+                    <img src="${url}" alt="Selected">
+                `).join('');
+            } else {
+                display.innerHTML = `
+                    <img src="${value}" alt="Selected">
+                    <div class="url">${value}</div>
+                `;
+            }
+        }
+
+        function copyToClipboard(text) {
+            if (!text) return;
+            if (Array.isArray(text)) {
+                text = text.join('\n');
+            }
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('✓ URL copied! Paste in your CMS field.');
+        }
+
+        function openPreview(url) {
+            document.getElementById('modalImg').src = url;
+            document.getElementById('previewModal').classList.add('active');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'previewModal') closePreview();
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Load images on page load
+        loadImages();
+    </script>
+</body>
+</html>

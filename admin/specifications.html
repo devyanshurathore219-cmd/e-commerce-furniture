@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifications — Admin</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><h1>🪑 Furniture CMS</h1><button class="sidebar-toggle" id="sidebarToggle">✕</button></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+        <a href="products.html"><span class="icon">📦</span> Products</a>
+        <a href="categories.html"><span class="icon">📂</span> Categories</a>
+        <a href="sections.html?productId=1"><span class="icon">📄</span> Sections</a>
+        <a href="gallery.html?productId=1"><span class="icon">🖼️</span> Gallery</a>
+        <a href="faqs.html?productId=1"><span class="icon">❓</span> FAQs</a>
+        <a href="specifications.html?productId=1" class="active"><span class="icon">📋</span> Specifications</a>
+        <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a href="#" id="btnLogoutSidebar"><span class="icon">🚪</span> Logout</a></div>
+    </aside>
+    <main class="main-content">
+      <div class="main-header"><h2>📋 Specifications</h2><span id="sidebarUser" style="font-size:13px;color:#64748b;"></span><button class="btn btn-primary" id="btnAddSpec">＋ Add Specification</button></div>
+      <p class="text-muted mb-4">Editing specs for: <strong id="currentProductName">...</strong></p>
+      <div id="specsList"></div>
+    </main>
+  </div>
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalTitle">Add Specification</h3><button class="modal-close" id="modalCloseBtn">×</button></div>
+      <form id="specForm">
+        <input type="hidden" id="editSpecId">
+        <div class="form-group"><label>Label *</label><input type="text" id="specLabel" class="form-control" required placeholder="e.g. Material"></div>
+        <div class="form-group"><label>Value *</label><input type="text" id="specValue" class="form-control" required placeholder="e.g. Solid Wood"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+          <button type="button" class="btn" id="btnCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Specification</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="assets/dashboard.js"></script>
+  <script src="assets/specifications.js"></script>
+  <script>
+    document.getElementById('btnLogoutSidebar').addEventListener('click', function(e) { e.preventDefault(); if (confirm('Logout?')) window.Admin.logout(); });
+    document.getElementById('modalCloseBtn').addEventListener('click', function() { document.getElementById('modalOverlay').classList.remove('active'); });
+  </script>
+</body>
+</html>

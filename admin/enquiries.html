@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enquiries - Admin</title>
+  <link rel="stylesheet" href="login-style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Figtree, sans-serif; background: #f5f4f3; color: #201c1a; padding: 20px; }
+    .admin-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px;
+      border-bottom: 1px solid rgba(32, 28, 26, 0.12);
+    }
+    .admin-header h1 { font-size: 28px; font-weight: 600; }
+    .admin-header nav { display: flex; gap: 12px; }
+    .admin-header nav a {
+      padding: 6px 14px; background: #2a2857; color: #fff;
+      border-radius: 6px; text-decoration: none; font-size: 14px;
+    }
+    .admin-header nav a:hover { opacity: 0.9; }
+    .alert {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+      font-size: 14px; display: none;
+    }
+    .alert.success { display: block; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert.error { display: block; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .stats { display: flex; gap: 16px; margin-bottom: 24px; }
+    .stat-box {
+      flex: 1; background: #fff; border-radius: 10px; padding: 20px;
+      border: 1px solid rgba(32, 28, 26, 0.1); text-align: center;
+    }
+    .stat-box .number { font-size: 32px; font-weight: 700; color: #2a2857; }
+    .stat-box .label { font-size: 13px; color: rgba(32, 28, 26, 0.6); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    th, td { padding: 12px 16px; text-align: left; font-size: 14px; border-bottom: 1px solid rgba(32, 28, 26, 0.06); }
+    th { background: #fafafa; font-weight: 600; color: rgba(32, 28, 26, 0.7); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    tr:hover { background: #f9f9f9; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 50px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-new { background: #fff3cd; color: #856404; }
+    .badge-contacted { background: #d4edda; color: #155724; }
+    .actions { display: flex; gap: 6px; }
+    .btn {
+      padding: 6px 14px; border: none; border-radius: 6px;
+      font-size: 13px; cursor: pointer; font-weight: 500;
+    }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-primary { background: #2a2857; color: #fff; }
+    .btn-secondary { background: #e9ecef; color: #201c1a; }
+    .btn-danger { background: #dc3545; color: #fff; }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .empty-state { text-align: center; padding: 60px 20px; color: rgba(32, 28, 26, 0.5); }
+    @media (max-width: 768px) {
+      th, td { padding: 8px 10px; font-size: 13px; }
+      .stats { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-header">
+    <h1>Enquiries</h1>
+    <nav>
+      <a href="categories.html">Categories</a>
+      <a href="enquiries.html">Enquiries</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+
+  <div id="alert" class="alert"></div>
+
+  <div class="stats" id="statsContainer">
+    <div class="stat-box">
+      <div class="number" id="stat-total">0</div>
+      <div class="label">Total Enquiries</div>
+    </div>
+    <div class="stat-box">
+      <div class="number" id="stat-new">0</div>
+      <div class="label">New</div>
+    </div>
+    <div class="stat-box">
+      <div class="number" id="stat-contacted">0</div>
+      <div class="label">Contacted</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Product</th>
+        <th>Message</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="enquiriesTable">
+    </tbody>
+  </table>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+
+    function showAlert(message, type) {
+      const alert = document.getElementById('alert');
+      alert.className = 'alert ' + type;
+      alert.textContent = message;
+      setTimeout(() => { alert.className = 'alert'; }, 3000);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function truncate(text, len) {
+      if (!text) return '-';
+      return text.length > len ? text.substring(0, len) + '...' : text;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function loadEnquiries() {
+      try {
+        const res = await fetch(API_BASE + '/enquiries');
+        const data = await res.json();
+        const tbody = document.getElementById('enquiriesTable');
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No enquiries found</td></tr>';
+          updateStats([]);
+          return;
+        }
+
+        // Update stats
+        updateStats(data);
+
+        tbody.innerHTML = data.map(enq => {
+          const statusBadge = enq.status === 'contacted'
+            ? '<span class="badge badge-contacted">Contacted</span>'
+            : '<span class="badge badge-new">New</span>';
+
+          const contactedBtn = enq.status === 'contacted'
+            ? '<button class="btn btn-sm btn-secondary" disabled>Contacted</button>'
+            : `<button class="btn btn-sm btn-primary" onclick="markContacted(${enq.id})">Mark Contacted</button>`;
+
+          return '<tr>' +
+            '<td>' + enq.id + '</td>' +
+            '<td>' + escapeHtml(enq.name) + '</td>' +
+            '<td><a href="mailto:' + escapeHtml(enq.email) + '">' + escapeHtml(enq.email) + '</a></td>' +
+            '<td>' + escapeHtml(enq.phone || '-') + '</td>' +
+            '<td>' + escapeHtml(enq.product_name || '—') + '</td>' +
+            '<td title="' + escapeHtml(enq.message || '') + '">' + truncate(escapeHtml(enq.message), 60) + '</td>' +
+            '<td>' + statusBadge + '</td>' +
+            '<td>' + formatDate(enq.created_at) + '</td>' +
+            '<td class="actions">' +
+              contactedBtn +
+              '<button class="btn btn-sm btn-danger" onclick="deleteEnquiry(' + enq.id + ', \'' + escapeHtml(enq.name) + '\')">Delete</button>' +
+            '</td>' +
+            '</tr>';
+        }).join('');
+      } catch (err) {
+        showAlert('Failed to load enquiries: ' + err.message, 'error');
+      }
+    }
+
+    function updateStats(data) {
+      const total = data.length;
+      const newCount = data.filter(e => e.status === 'new').length;
+      const contactedCount = data.filter(e => e.status === 'contacted').length;
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-new').textContent = newCount;
+      document.getElementById('stat-contacted').textContent = contactedCount;
+    }
+
+    async function markContacted(id) {
+      try {
+        const res = await fetch(API_BASE + '/enquiries/' + id + '/contacted', { method: 'PUT' });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('Enquiry #' + id + ' marked as contacted', 'success');
+          loadEnquiries();
+        } else {
+          showAlert(data.message || 'Failed to update enquiry', 'error');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteEnquiry(id, name) {
+      if (!confirm('Are you sure you want to delete the enquiry from "' + name + '"?')) return;
+      try {
+        const res = await fetch(API_BASE + '/enquiries/' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('Enquiry deleted successfully', 'success');
+          loadEnquiries();
+        } else {
+          showAlert(data.message || 'Failed to delete enquiry', 'error');
+        }
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+
+    // Load on page load
+    loadEnquiries();
+  </script>
+</body>
+</html>

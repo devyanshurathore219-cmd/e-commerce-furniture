@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Admin</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>🪑 Furniture CMS</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">✕</button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+        <a href="products.html"><span class="icon">📦</span> Products</a>
+        <a href="categories.html"><span class="icon">📂</span> Categories</a>
+        <a href="sections.html?productId=1"><span class="icon">📄</span> Product Sections</a>
+        <a href="gallery.html?productId=1"><span class="icon">🖼️</span> Gallery</a>
+        <a href="faqs.html?productId=1"><span class="icon">❓</span> FAQs</a>
+        <a href="specifications.html?productId=1"><span class="icon">📋</span> Specifications</a>
+        <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" id="btnLogoutSidebar"><span class="icon">🚪</span> Logout</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="main-header">
+        <h2>📊 Dashboard Overview</h2>
+        <div class="main-header-actions">
+          <span id="sidebarUser" style="font-size:13px;color:#64748b;"></span>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-number" id="statProducts">—</div>
+          <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📂</div>
+          <div class="stat-number" id="statCategories">—</div>
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✉️</div>
+          <div class="stat-number" id="statEnquiries">—</div>
+          <div class="stat-label">Enquiries</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📄</div>
+          <div class="stat-number" id="statSections">—</div>
+          <div class="stat-label">Sections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🖼️</div>
+          <div class="stat-number" id="statGallery">—</div>
+          <div class="stat-label">Gallery Images</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">❓</div>
+          <div class="stat-number" id="statFaqs">—</div>
+          <div class="stat-label">FAQs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-number" id="statSpecs">—</div>
+          <div class="stat-label">Specifications</div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="card" id="dashboardLoading">
+        <div class="loading">Loading dashboard data...</div>
+      </div>
+
+      <!-- Error State (hidden by default) -->
+      <div class="card" id="dashboardError" style="display:none;">
+        <div class="empty-state">
+          <div class="empty-icon">⚠️</div>
+          <p>Failed to load dashboard. <button class="btn btn-sm btn-primary mt-2" onclick="loadDashboardStats()">Retry</button></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="assets/dashboard.js"></script>
+  <script>
+    function loadDashboardStats() {
+      var loading = document.getElementById('dashboardLoading');
+      var error = document.getElementById('dashboardError');
+      if (loading) loading.style.display = 'none';
+      if (error) error.style.display = 'none';
+
+      window.Admin.fetch(window.Admin.API_BASE + '/dashboard/stats')
+        .then(function(data) {
+          document.getElementById('statProducts').textContent = data.totalProducts || 0;
+          document.getElementById('statCategories').textContent = data.totalCategories || 0;
+          document.getElementById('statEnquiries').textContent = data.totalEnquiries || 0;
+          document.getElementById('statSections').textContent = data.totalSections || 0;
+          document.getElementById('statGallery').textContent = data.totalGalleryImages || 0;
+          document.getElementById('statFaqs').textContent = data.totalFaqs || 0;
+          document.getElementById('statSpecs').textContent = data.totalSpecs || 0;
+        })
+        .catch(function() {
+          if (error) error.style.display = 'block';
+        });
+    }
+
+    // Load stats after dashboard.js initializes
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(loadDashboardStats, 100);
+      });
+    } else {
+      setTimeout(loadDashboardStats, 100);
+    }
+
+    // Sidebar logout button
+    document.getElementById('btnLogoutSidebar').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) {
+        window.Admin.logout();
+      }
+    });
+  </script>
+</body>
+</html>

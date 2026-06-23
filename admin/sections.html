@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Sections — Admin</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>🪑 Furniture CMS</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">✕</button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+        <a href="products.html"><span class="icon">📦</span> Products</a>
+        <a href="categories.html"><span class="icon">📂</span> Categories</a>
+        <a href="sections.html?productId=1" class="active"><span class="icon">📄</span> Product Sections</a>
+        <a href="gallery.html?productId=1"><span class="icon">🖼️</span> Gallery</a>
+        <a href="faqs.html?productId=1"><span class="icon">❓</span> FAQs</a>
+        <a href="specifications.html?productId=1"><span class="icon">📋</span> Specifications</a>
+        <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" id="btnLogoutSidebar"><span class="icon">🚪</span> Logout</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="main-header">
+        <h2>📄 Product Sections</h2>
+        <div class="main-header-actions">
+          <span id="sidebarUser" style="font-size:13px;color:#64748b;"></span>
+          <button class="btn btn-primary" id="btnAddSection">＋ Add Section</button>
+        </div>
+      </div>
+
+      <p class="text-muted mb-4">Editing sections for: <strong id="currentProductName">...</strong></p>
+      <div id="sectionsList"></div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Section</h3>
+        <button class="modal-close" id="modalCloseBtn">×</button>
+      </div>
+      <form id="sectionForm">
+        <input type="hidden" id="editSectionId">
+        <div class="form-group">
+          <label>Section Type *</label>
+          <select id="sectionType" class="form-control" required>
+            <option value="hero">Hero Section</option>
+            <option value="ingredients">Ingredients Section</option>
+            <option value="benefits">Benefits Section</option>
+            <option value="cta">CTA Section</option>
+            <option value="footer">Footer Section</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="sectionTitle" class="form-control" placeholder="Section heading">
+        </div>
+        <div class="form-group">
+          <label>Subtitle</label>
+          <input type="text" id="sectionSubtitle" class="form-control" placeholder="Optional subtitle">
+        </div>
+        <div class="form-group">
+          <label>Content</label>
+          <textarea id="sectionContent" class="form-control" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Button Text</label>
+          <input type="text" id="sectionButtonText" class="form-control" placeholder="e.g. Shop Now">
+        </div>
+        <div class="form-group">
+          <label>Button Link</label>
+          <input type="text" id="sectionButtonLink" class="form-control" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>Sort Order</label>
+          <input type="number" id="sectionSortOrder" class="form-control" value="0">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+          <button type="button" class="btn" id="btnCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Section</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/dashboard.js"></script>
+  <script src="assets/sections.js"></script>
+  <script>
+    document.getElementById('btnLogoutSidebar').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) window.Admin.logout();
+    });
+    document.getElementById('modalCloseBtn').addEventListener('click', function() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    });
+  </script>
+</body>
+</html>

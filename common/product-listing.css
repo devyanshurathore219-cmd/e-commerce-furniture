@@ -1,0 +1,215 @@
+/**
+ * CMS Product Listing styles
+ * Scoped to .cms-product-listing — does not override existing theme CSS.
+ */
+
+.cms-product-listing {
+  background: #fbf9eb;
+  padding: 40px 20px 60px;
+}
+
+.cms-product-listing__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cms-product-listing__header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.cms-product-listing__title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #201c1a;
+  margin: 0 0 8px;
+  text-transform: none;
+}
+
+.cms-product-listing__subtitle {
+  font-size: 1rem;
+  color: rgba(32, 28, 26, 0.6);
+  margin: 0;
+}
+
+.cms-product-listing__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid rgba(32, 28, 26, 0.12);
+  border-radius: 8px;
+}
+
+.cms-product-listing__filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.cms-product-listing__filter-group--price {
+  flex: 0 0 auto;
+  min-width: 120px;
+}
+
+.cms-product-listing__filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #201c1a;
+}
+
+.cms-product-listing__search-input,
+.cms-product-listing__select,
+.cms-product-listing__price-input {
+  padding: 10px 14px;
+  border: 1px solid rgba(32, 28, 26, 0.2);
+  border-radius: 6px;
+  font-size: 14px;
+  color: #201c1a;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cms-product-listing__search-input:focus,
+.cms-product-listing__select:focus,
+.cms-product-listing__price-input:focus {
+  outline: 2px solid #2a2857;
+  outline-offset: 1px;
+}
+
+.cms-product-listing__results-count {
+  font-size: 14px;
+  color: rgba(32, 28, 26, 0.6);
+  margin-bottom: 20px;
+}
+
+#cms-product-grid .cms-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+#cms-product-grid .product-card {
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+#cms-product-grid .product-card:hover {
+  transform: translateY(-2px);
+}
+
+#cms-product-grid .product-card__media {
+  position: relative;
+  padding-bottom: 100%;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  background: #e5e5e5;
+}
+
+#cms-product-grid .product-card__media img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#cms-product-grid .product-card__info {
+  padding: 12px 0;
+}
+
+#cms-product-grid .product-card__info-title {
+  margin: 0 0 4px;
+}
+
+#cms-product-grid .product-card__info-price {
+  font-weight: 600;
+}
+
+#cms-product-grid .product-card__info-price .cms-sale-price {
+  color: #dc3545;
+  margin-right: 8px;
+}
+
+#cms-product-grid .product-card__info-price .cms-original-price {
+  text-decoration: line-through;
+  color: #999;
+  font-weight: 400;
+}
+
+.cms-no-products,
+.cms-error {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(32, 28, 26, 0.6);
+}
+
+.cms-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  padding: 40px 0 0;
+  margin: 0;
+}
+
+.cms-pagination__item a {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid rgba(32, 28, 26, 0.15);
+  border-radius: 6px;
+  color: #201c1a;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.cms-pagination__item a:hover {
+  background: #f0f0f0;
+}
+
+.cms-pagination__item.cms-pagination__current {
+  padding: 8px 14px;
+  background: #2a2857;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cms-pagination__item.cms-pagination__disabled a {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.cms-pagination__ellipsis {
+  padding: 8px 6px;
+  color: rgba(32, 28, 26, 0.4);
+}
+
+@media (max-width: 768px) {
+  .cms-product-listing {
+    padding: 24px 16px 40px;
+  }
+
+  .cms-product-listing__filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cms-product-listing__filter-group--price {
+    flex: 1;
+  }
+}

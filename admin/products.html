@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products — Admin</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>🪑 Furniture CMS</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">✕</button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+        <a href="products.html"><span class="icon">📦</span> Products</a>
+        <a href="categories.html"><span class="icon">📂</span> Categories</a>
+        <a href="sections.html?productId=1"><span class="icon">📄</span> Product Sections</a>
+        <a href="gallery.html?productId=1"><span class="icon">🖼️</span> Gallery</a>
+        <a href="faqs.html?productId=1"><span class="icon">❓</span> FAQs</a>
+        <a href="specifications.html?productId=1"><span class="icon">📋</span> Specifications</a>
+        <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" id="btnLogoutSidebar"><span class="icon">🚪</span> Logout</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="main-header">
+        <h2>📦 Products</h2>
+        <div class="main-header-actions">
+          <span id="sidebarUser" style="font-size:13px;color:#64748b;"></span>
+          <button class="btn btn-primary" id="btnAddProduct">＋ Add Product</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card">
+        <div class="flex gap-3" style="flex-wrap:wrap;">
+          <div class="search-bar" style="flex:1;min-width:200px;">
+            <input type="text" id="searchInput" placeholder="Search by name, brand, SKU...">
+          </div>
+          <select id="filterCategory" class="form-control" style="width:auto;min-width:180px;">
+            <option value="">All Categories</option>
+          </select>
+          <span class="text-muted" id="totalInfo" style="align-self:center;"></span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Brand</th>
+              <th>Price</th>
+              <th>Sale Price</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <tr><td colspan="7" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+        <div id="pagination"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Product</h3>
+        <button class="modal-close" id="modalCloseBtn">×</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="editProductId">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="productName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Slug</label>
+          <input type="text" id="productSlug" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Brand</label>
+          <input type="text" id="productBrand" class="form-control">
+        </div>
+        <div class="flex gap-3">
+          <div class="form-group" style="flex:1;">
+            <label>Price *</label>
+            <input type="number" step="0.01" id="productPrice" class="form-control" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Sale Price</label>
+            <input type="number" step="0.01" id="productSalePrice" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="productDescription" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="productStatus" class="form-control">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+          <button type="button" class="btn" id="btnCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/dashboard.js"></script>
+  <script src="assets/products.js"></script>
+  <script>
+    document.getElementById('btnLogoutSidebar').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) window.Admin.logout();
+    });
+    document.getElementById('modalCloseBtn').addEventListener('click', function() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    });
+  </script>
+</body>
+</html>

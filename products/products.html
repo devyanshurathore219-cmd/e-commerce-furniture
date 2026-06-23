@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Products - CMS Product Listing</title>
+
+  <!-- Product Listing CSS -->
+  <link rel="stylesheet" href="../common/product-listing.css">
+
+  <style>
+    /* Minimal base styling — does not override existing theme/CMS styles */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Figtree, sans-serif;
+      background: #fbf9eb;
+      color: #201c1a;
+      line-height: 1.4;
+    }
+    .page-wrapper { max-width: 100%; overflow-x: hidden; }
+    .skip-link {
+      position: absolute; top: -100%; left: 0;
+      background: #2a2857; color: #fff;
+      padding: 8px 16px; z-index: 1000;
+    }
+    .skip-link:focus { top: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#MainContent">Skip to content</a>
+
+  <div class="page-wrapper">
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      <!--
+        The CMS product listing section is dynamically injected here by product-listing.js.
+        It inserts a section with id="cms-product-listing" containing:
+          - Search input
+          - Category filter dropdown
+          - Price min/max inputs
+          - Results count
+          - Product grid
+          - Pagination
+        All data is loaded from the backend API at http://localhost:5000/api.
+        Clicking a product navigates to product.html?id=PRODUCT_ID.
+      -->
+    </main>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- CMS / API Scripts                                                -->
+  <!-- ================================================================ -->
+
+  <!-- Shared Product API (fetchProducts, fetchCategories, fetchGallery) -->
+  <script src="../common/product-api.js"></script>
+
+  <!-- Product Listing Module (injects search, filters, grid, pagination) -->
+  <script src="../pages/product-listing.js"></script>
+
+</body>
+</html>

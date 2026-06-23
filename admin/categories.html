@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories — Admin</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>🪑 Furniture CMS</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">✕</button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+        <a href="products.html"><span class="icon">📦</span> Products</a>
+        <a href="categories.html" class="active"><span class="icon">📂</span> Categories</a>
+        <a href="sections.html?productId=1"><span class="icon">📄</span> Product Sections</a>
+        <a href="gallery.html?productId=1"><span class="icon">🖼️</span> Gallery</a>
+        <a href="faqs.html?productId=1"><span class="icon">❓</span> FAQs</a>
+        <a href="specifications.html?productId=1"><span class="icon">📋</span> Specifications</a>
+        <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" id="btnLogoutSidebar"><span class="icon">🚪</span> Logout</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="main-header">
+        <h2>📂 Categories</h2>
+        <div class="main-header-actions">
+          <button class="btn btn-primary" id="btnAddCategory">＋ Add Category</button>
+        </div>
+      </div>
+
+      <div class="card table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="categoriesTableBody">
+            <tr><td colspan="3" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Category</h3>
+        <button class="modal-close" id="modalCloseBtn">×</button>
+      </div>
+      <form id="categoryForm">
+        <input type="hidden" id="editCategoryId">
+        <div class="form-group">
+          <label>Category Name *</label>
+          <input type="text" id="categoryName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Slug</label>
+          <input type="text" id="categorySlug" class="form-control" placeholder="e.g. living-room">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+          <button type="button" class="btn" id="btnCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/dashboard.js"></script>
+  <script src="assets/categories.js"></script>
+  <script>
+    document.getElementById('btnLogoutSidebar').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) window.Admin.logout();
+    });
+    document.getElementById('modalCloseBtn').addEventListener('click', function() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    });
+  </script>
+</body>
+</html>
